@@ -92,6 +92,8 @@ class RecaptchaHelper extends AppHelper {
 			'recaptchaOptions' => array(
 				'sitekey' => Configure::read('Recaptcha.publicKey'),
 				'theme'   => 'light',
+				'callback' => 'captchaResponse',
+				'expired-callback' => 'captchaExpired',
 			),
 		);
 
