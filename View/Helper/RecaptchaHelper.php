@@ -25,7 +25,7 @@ class RecaptchaHelper extends AppHelper {
  *
  * @var string
  */
-	public $apiUrl = 'https://www.google.com/recaptcha/api.js';
+	public $apiUrl = 'https://challenges.cloudflare.com/turnstile/v0/api.js?compat=recaptcha';
 
 /**
  * View helpers
@@ -55,7 +55,7 @@ class RecaptchaHelper extends AppHelper {
 			$script[] = sprintf("var %s = function() {", $this->callback);
 			foreach ($this->explicit as $k => $v) {
 				array_unshift($script, sprintf('var %s;', $k));
-				$script[] = sprintf('%s = grecaptcha.render(\'%s\', %s);', $k, $k, json_encode($v));
+				$script[] = sprintf('%s = grecaptcha.render(\'#%s\', %s);', $k, $k, json_encode($v));
 			}
 			$script[] = "}";
 
@@ -90,7 +90,7 @@ class RecaptchaHelper extends AppHelper {
 			),
 			'lang'             => 'en',
 			'recaptchaOptions' => array(
-				'sitekey' => Configure::read('Recaptcha.publicKey'),
+				'sitekey' => Configure::read('Turnstile.siteKey'),
 				'theme'   => 'light',
 			),
 		);
@@ -153,8 +153,12 @@ class RecaptchaHelper extends AppHelper {
 
 		$this->Form->unlockField('g-recaptcha-response');
 
-		$apiUrl = $this->apiUrl . '?' . http_build_query($query);
-		$this->Html->script($apiUrl, array('block' => 'script', 'async' => true, 'defer' => true, 'once' => true));
+        $apiUrl = $this->apiUrl . '&' . http_build_query($query);
+        if (strpos($this->apiUrl, '?') === 0) {
+            $apiUrl = $this->apiUrl . '?' . http_build_query($query);
+        }
+
+        $this->Html->script($apiUrl, array('block' => 'script', 'async' => true, 'defer' => true, 'once' => true));
 
 		return $output;
 	}

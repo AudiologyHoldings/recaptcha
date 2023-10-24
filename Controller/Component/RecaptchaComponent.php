@@ -32,7 +32,7 @@ class RecaptchaComponent extends Component {
  *
  * @var string
  */
-	public $apiUrl = 'https://www.google.com/recaptcha/api/siteverify';
+	public $apiUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
 /**
  * Private API Key
@@ -100,7 +100,7 @@ class RecaptchaComponent extends Component {
 		if ($controller->name === 'CakeError') {
 			return;
 		}
-		$this->privateKey = Configure::read('Recaptcha.privateKey');
+		$this->privateKey = Configure::read('Turnstile.secretKey');
 		$this->Controller = $controller;
 
 		if (!isset($this->Controller->helpers['Recaptcha.Recaptcha'])) {
