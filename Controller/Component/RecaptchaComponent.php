@@ -154,7 +154,8 @@ class RecaptchaComponent extends Component {
 		}
 
 		$response = $this->_getApiResponse();
-		if (!$response = json_decode($response->body())) {
+//		if (!$response = json_decode($response->body())) {
+		if (!$response = json_decode($response)) {
 			$this->error = __d('recaptcha', 'Invalid API response, please contact the site admin.', true);
 			return false;
 		}
@@ -172,12 +173,22 @@ class RecaptchaComponent extends Component {
  * @return HttpSocketResponse
  */
 	protected function _getApiResponse() {
-		$Socket = new HttpSocket();
-		return $Socket->post($this->apiUrl, array(
-			'secret'   => $this->privateKey,
+
+        $data = array(
+            'secret'   => $this->privateKey,
 			'remoteip' => env('REMOTE_ADDR'),
 			'response' => $this->Controller->request->data['g-recaptcha-response'],
-		));
+        );
+
+        // Initialize cURL
+        $curl = curl_init();
+        // Set the cURL options
+        curl_setopt($curl, CURLOPT_URL, $this->apiUrl);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // Execute the cURL request
+        return curl_exec($curl);
 	}
 
 }
